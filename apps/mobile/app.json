@@ -5,6 +5,20 @@
     "version": "0.1.0",
     "orientation": "portrait",
     "platforms": ["ios", "android", "web"],
-    "assetBundlePatterns": ["**/*"]
+    "assetBundlePatterns": ["**/*"],
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "AutoPartSnap necesita acceder a la cámara para identificar piezas."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "AutoPartSnap necesita tus fotos para subir imágenes de partes."
+        }
+      ]
+    ]
   }
 }

@@ -20,9 +20,9 @@ export function HomeNavigator() {
       }}
     >
       <Stack.Screen name="Home" component={HomeScreen} options={{ title: "Home" }} />
-      <Stack.Screen name="VehicleInfo" component={VehicleInfoScreen} options={{ title: "Vehicle info" }} />
+      <Stack.Screen name="VehicleInfo" component={VehicleInfoScreen} options={{ title: "Vehículo" }} />
       <Stack.Screen name="Analyze" component={AnalyzeScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="Result" component={ResultScreen} options={{ title: "Result" }} />
+      <Stack.Screen name="Result" component={ResultScreen} options={{ title: "Resultado" }} />
     </Stack.Navigator>
   );
 }

@@ -23,7 +23,7 @@ export function AppTabsNavigator() {
         name="HomeTab"
         component={HomeNavigator}
         options={{
-          title: "Home",
+          title: "Inicio",
           tabBarIcon: ({ color, size }) => <Feather name="home" size={size} color={color} />
         }}
       />
@@ -31,7 +31,7 @@ export function AppTabsNavigator() {
         name="HistoryTab"
         component={HistoryNavigator}
         options={{
-          title: "History",
+          title: "Historial",
           tabBarIcon: ({ color, size }) => <Feather name="clock" size={size} color={color} />
         }}
       />

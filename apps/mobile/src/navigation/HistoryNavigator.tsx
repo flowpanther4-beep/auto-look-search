@@ -17,8 +17,8 @@ export function HistoryNavigator() {
         contentStyle: { backgroundColor: theme.colors.background }
       }}
     >
-      <Stack.Screen name="History" component={HistoryScreen} options={{ title: "History" }} />
-      <Stack.Screen name="HistoryDetail" component={HistoryDetailScreen} options={{ title: "Details" }} />
+      <Stack.Screen name="History" component={HistoryScreen} options={{ title: "Historial" }} />
+      <Stack.Screen name="HistoryDetail" component={HistoryDetailScreen} options={{ title: "Detalle" }} />
     </Stack.Navigator>
   );
 }

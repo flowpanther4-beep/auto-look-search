@@ -8,10 +8,10 @@ import { saveHistoryItem } from "../../storage/history";
 import { theme } from "../../theme";
 
 const states = [
-  { key: "uploading", label: "Uploading photo...", progress: 0.2 },
-  { key: "reading_image", label: "Reading image details...", progress: 0.45 },
-  { key: "matching_database", label: "Matching vehicle parts...", progress: 0.75 },
-  { key: "finalizing", label: "Finalizing insights...", progress: 1 }
+  { key: "analizando", label: "Analizando la pieza...", progress: 0.2 },
+  { key: "comparando", label: "Comparando con base de datos...", progress: 0.5 },
+  { key: "compatibilidad", label: "Buscando compatibilidad...", progress: 0.78 },
+  { key: "finalizando", label: "Preparando recomendaciones...", progress: 1 }
 ] as const;
 
 type AnalyzeState = (typeof states)[number];
@@ -66,36 +66,87 @@ export function AnalyzeScreen({ route, navigation }: NativeStackScreenProps<Home
       <View
         style={{
           flex: 1,
-          backgroundColor: "rgba(15,23,42,0.55)",
+          backgroundColor: "rgba(12,17,33,0.65)",
           alignItems: "center",
           justifyContent: "center",
           padding: theme.spacing.lg
         }}
       >
         <StatusBar style="light" />
-        <View style={{ backgroundColor: theme.colors.card, borderRadius: theme.radius.xl, padding: theme.spacing.lg, width: "100%" }}>
-          <Text style={{ color: theme.colors.muted, fontWeight: "700" }}>Smart analysis</Text>
-          <Text style={{ color: theme.colors.text, fontSize: 22, fontWeight: "800", marginTop: 8 }}>{current.label}</Text>
+        <View style={{ backgroundColor: theme.colors.card, borderRadius: theme.radius.xl, padding: theme.spacing.lg, width: "100%", gap: theme.spacing.md }}>
+          <View style={{ alignSelf: "flex-start", backgroundColor: "rgba(15,37,110,0.08)", paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12 }}>
+            <Text style={{ color: theme.colors.primary, fontWeight: "800" }}>AutoPartSnap Pro</Text>
+          </View>
 
-          <View style={{ marginTop: theme.spacing.md, height: 10, backgroundColor: theme.colors.border, borderRadius: theme.radius.md, overflow: "hidden" }}>
+          <Text style={{ color: theme.colors.text, fontSize: 24, fontWeight: "800" }}>Analizando tu captura</Text>
+          <Text style={{ color: theme.colors.muted }}>
+            Estamos procesando la foto, comparando con miles de referencias y calculando compatibilidad con tu vehículo.
+          </Text>
+
+          <View style={{ alignItems: "center", gap: 10 }}>
+            <View
+              style={{
+                width: 90,
+                height: 90,
+                borderRadius: 48,
+                borderWidth: 12,
+                borderColor: "rgba(15,37,110,0.12)",
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              <Animated.View style={{ transform: [{ scale: progress.interpolate({ inputRange: [0, 1], outputRange: [0.95, 1.05] }) }] }}>
+                <View
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: 18,
+                    backgroundColor: theme.colors.primary,
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}
+                >
+                  <Text style={{ color: "#fff", fontWeight: "800" }}>{Math.round(states.findIndex((s) => s.key === current.key) / (states.length - 1) * 100)}%</Text>
+                </View>
+              </Animated.View>
+            </View>
+            <Text style={{ color: theme.colors.text, fontSize: 18, fontWeight: "800" }}>{current.label}</Text>
+            <Text style={{ color: theme.colors.muted }}>No cierres la app, esto tarda unos segundos.</Text>
+          </View>
+
+          <View style={{ height: 12, backgroundColor: theme.colors.border, borderRadius: theme.radius.md, overflow: "hidden" }}>
             <Animated.View style={{ width, height: "100%", backgroundColor: theme.colors.primary }} />
           </View>
 
-          <View style={{ marginTop: theme.spacing.md, gap: 6 }}>
-            <Text style={{ color: theme.colors.muted }}>Steps</Text>
+          <View style={{ gap: 8 }}>
+            <Text style={{ color: theme.colors.muted, fontWeight: "700" }}>Pasos en vivo</Text>
             {states.map((step) => (
-              <View key={step.key} style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-                <View
-                  style={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: 6,
-                    backgroundColor: current.key === step.key ? theme.colors.primary : theme.colors.border
-                  }}
-                />
-                <Text style={{ color: current.key === step.key ? theme.colors.text : theme.colors.muted, fontWeight: "700" }}>
-                  {step.label}
-                </Text>
+              <View
+                key={step.key}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  paddingVertical: 6,
+                  paddingHorizontal: 6,
+                  backgroundColor: current.key === step.key ? "rgba(15,37,110,0.06)" : "transparent",
+                  borderRadius: 12
+                }}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                  <View
+                    style={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: 6,
+                      backgroundColor: current.key === step.key ? theme.colors.primary : theme.colors.border
+                    }}
+                  />
+                  <Text style={{ color: current.key === step.key ? theme.colors.text : theme.colors.muted, fontWeight: "700" }}>
+                    {step.label}
+                  </Text>
+                </View>
+                <Text style={{ color: current.key === step.key ? theme.colors.primary : theme.colors.muted }}>{Math.round(step.progress * 100)}%</Text>
               </View>
             ))}
           </View>

@@ -26,13 +26,17 @@ export function HistoryScreen({ navigation }: NativeStackScreenProps<HistoryStac
 
   return (
     <Screen scrollable={false}>
-      <AppHeader title="History" subtitle="See what you've confirmed and revisit low-confidence runs" />
+      <AppHeader
+        accent="Seguimiento"
+        title="Historial elegante"
+        subtitle="Revisa tus piezas confirmadas o retoma las que dejaron dudas."
+      />
       <FlatList
         data={history}
         keyExtractor={(item) => item.id}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={fetchHistory} />}
         ListEmptyComponent={() => (
-          <EmptyState title="No history yet" description="Analyze a part to see it appear here." icon="📂" />
+          <EmptyState title="Sin historial aún" description="Toma una foto y aparecerá aquí con su confianza." icon="📂" />
         )}
         renderItem={({ item }) => (
           <ListRow

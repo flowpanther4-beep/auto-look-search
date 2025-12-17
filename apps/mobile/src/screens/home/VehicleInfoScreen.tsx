@@ -49,9 +49,9 @@ export function VehicleInfoScreen({ route, navigation }: NativeStackScreenProps<
   return (
     <Screen scrollable={false}>
       <AppHeader
-        accent="Refine results"
-        title="Add quick vehicle context"
-        subtitle="We only ask when confidence is low. This helps us lock onto the right part."
+        accent="Mejora la coincidencia"
+        title="Agrega datos rápidos del vehículo"
+        subtitle="Solo lo pedimos cuando la confianza es baja. Ayuda a fijar la pieza correcta."
       />
 
       <View style={{ flex: 1 }}>
@@ -75,14 +75,14 @@ export function VehicleInfoScreen({ route, navigation }: NativeStackScreenProps<
           keyboardType="numeric"
         />
         <TextField
-          label="Engine (optional)"
+          label="Motor (opcional)"
           value={values.engine ?? ""}
           onChangeText={(text) => setValue("engine", text, { shouldValidate: true })}
-          helper="Trim, displacement, or fuel type"
+          helper="Versión, cilindrada o tipo de combustible"
         />
 
         <View style={{ marginBottom: theme.spacing.md }}>
-          <AppHeader title="Part location" subtitle="Helps prioritize the right subsystem." />
+          <AppHeader title="Ubicación de la pieza" subtitle="Ayuda a priorizar el subsistema correcto." />
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
             {PART_LOCATIONS.map((location) => (
               <Chip

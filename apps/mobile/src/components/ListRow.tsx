@@ -46,7 +46,9 @@ export function ListRow({ title, subtitle, meta, onPress, thumbnail, status = "n
               borderRadius: theme.radius.md
             }}
           >
-            <Text style={{ color: badgeColor, fontWeight: "700" }}>{status === "confirmed" ? "Confirmed" : "Not sure"}</Text>
+            <Text style={{ color: badgeColor, fontWeight: "700" }}>
+              {status === "confirmed" ? "Confirmado" : "Por revisar"}
+            </Text>
           </View>
         </View>
         <Text style={{ color: theme.colors.muted, marginTop: 4 }}>{subtitle}</Text>

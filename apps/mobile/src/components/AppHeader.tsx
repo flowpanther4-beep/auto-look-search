@@ -14,13 +14,15 @@ export function AppHeader({ title, subtitle, accent }: AppHeaderProps) {
         <View
           style={{
             alignSelf: "flex-start",
-            backgroundColor: "rgba(15, 23, 42, 0.06)",
-            paddingHorizontal: 10,
-            paddingVertical: 6,
-            borderRadius: theme.radius.md
+            backgroundColor: "rgba(29, 78, 216, 0.08)",
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            borderRadius: theme.radius.md,
+            borderWidth: 1,
+            borderColor: "rgba(29, 78, 216, 0.2)"
           }}
         >
-          <Text style={{ color: theme.colors.primary, fontWeight: "700" }}>{accent}</Text>
+          <Text style={{ color: theme.colors.primary, fontWeight: "700", letterSpacing: 0.2 }}>{accent}</Text>
         </View>
       ) : null}
       <Text style={{ fontSize: 26, fontWeight: "800", color: theme.colors.text }}>{title}</Text>

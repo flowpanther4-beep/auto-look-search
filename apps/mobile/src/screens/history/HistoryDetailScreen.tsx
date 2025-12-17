@@ -24,7 +24,7 @@ export function HistoryDetailScreen({ route }: NativeStackScreenProps<HistorySta
   return (
     <Screen>
       <AppHeader
-        accent={item.status === "confirmed" ? "Confirmed" : "Not sure"}
+        accent={item.status === "confirmed" ? "Confirmado" : "Por revisar"}
         title={item.topCandidateName}
         subtitle={new Date(item.createdAt).toLocaleString()}
       />

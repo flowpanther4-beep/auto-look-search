@@ -11,7 +11,11 @@ import { AppHeader } from "../../components/AppHeader";
 import { HomeStackParamList } from "../../navigation/types";
 import { theme } from "../../theme";
 
-const overlayTexts = ["Analyzing shape...", "Detecting connectors...", "Matching vehicle parts..."];
+const overlayTexts = [
+  "Analizando la pieza...",
+  "Comparando con base de datos...",
+  "Buscando compatibilidad..."
+];
 
 export function HomeScreen({ navigation }: NativeStackScreenProps<HomeStackParamList, "Home">) {
   const [lastPhoto, setLastPhoto] = useState<string | undefined>();
@@ -59,13 +63,14 @@ export function HomeScreen({ navigation }: NativeStackScreenProps<HomeStackParam
   };
 
   const goToAnalyze = (uri: string) => {
+    const hint = searchTerm.trim();
     setLastPhoto(uri);
     startShutter();
     setTimeout(() => {
       scanLoop.current?.stop();
       scanTranslate.setValue(-140);
       setShowOverlay(false);
-      navigation.navigate("Analyze", { photoUri: uri, searchTerm });
+      navigation.navigate("Analyze", { photoUri: uri, searchTerm: hint || undefined });
     }, 1000);
   };
 
@@ -97,66 +102,109 @@ export function HomeScreen({ navigation }: NativeStackScreenProps<HomeStackParam
 
   return (
     <Screen>
-      <AppHeader
-        accent="AI-powered"
-        title="Identify a part in seconds"
-        subtitle="Snap, upload, and let the assistant do the heavy lifting."
-      />
-
-      <Card>
-        <Text style={{ color: theme.colors.muted, fontWeight: "600" }}>What part are you trying to identify?</Text>
-        <TextInput
-          value={searchTerm}
-          onChangeText={setSearchTerm}
-          placeholder="e.g. alternator, sensor, brake caliper"
-          placeholderTextColor={theme.colors.muted}
-          style={{
-            backgroundColor: theme.colors.card,
-            borderColor: theme.colors.border,
-            borderWidth: 1,
-            borderRadius: theme.radius.lg,
-            paddingHorizontal: theme.spacing.md,
-            paddingVertical: theme.spacing.sm,
-            color: theme.colors.text,
-            marginTop: theme.spacing.sm
-          }}
+      <View style={{ gap: theme.spacing.md }}>
+        <AppHeader
+          accent="Premium · Instantáneo"
+          title="Identifica tu pieza"
+          subtitle="Toma o sube una foto para analizarla con nuestra IA."
         />
 
-        <View style={{ marginTop: theme.spacing.md, gap: 10 }}>
-          <PrimaryButton
-            title="Take photo"
-            onPress={handleTakePhoto}
-            icon={<Feather name="camera" size={18} color="#fff" />}
-          />
-          <SecondaryButton
-            title="Upload photo"
-            onPress={handleUpload}
-            icon={<Feather name="image" size={18} color={theme.colors.text} />}
-          />
-        </View>
-      </Card>
-
-      <View style={{ flexDirection: "row", gap: 12, marginBottom: theme.spacing.md }}>
-        {[
-          { title: "Use natural light", icon: "🌤️" },
-          { title: "Focus on connectors", icon: "🧩" },
-          { title: "Capture labels", icon: "🏷️" }
-        ].map((tip) => (
-          <Card key={tip.title} padded={true}>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-              <Text style={{ fontSize: 18 }}>{tip.icon}</Text>
-              <Text style={{ color: theme.colors.text, fontWeight: "700", flexShrink: 1 }}>{tip.title}</Text>
-            </View>
-          </Card>
-        ))}
-      </View>
-
-      {lastPhoto ? (
         <Card>
-          <Text style={{ color: theme.colors.muted, marginBottom: 8 }}>Last capture</Text>
-          <Image source={{ uri: lastPhoto }} style={{ width: "100%", height: 220, borderRadius: theme.radius.lg }} />
+          <View style={{ gap: theme.spacing.md }}>
+            <View style={{ gap: 6 }}>
+              <Text style={{ color: theme.colors.text, fontSize: 20, fontWeight: "800" }}>Captura limpia y rápida</Text>
+              <Text style={{ color: theme.colors.muted }}>
+                Abre la cámara o sube la foto. Nosotros nos encargamos de detectar la pieza y guiarte para comprarla.
+              </Text>
+            </View>
+
+            <View
+              style={{
+                backgroundColor: "#eef2ff",
+                borderRadius: theme.radius.xl,
+                padding: theme.spacing.md,
+                borderWidth: 1,
+                borderColor: "#e0e7ff",
+                alignItems: "center",
+                gap: theme.spacing.sm
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: "#0f256e",
+                  width: 64,
+                  height: 64,
+                  borderRadius: 20,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  shadowColor: "#0f256e",
+                  shadowOpacity: 0.18,
+                  shadowRadius: 16,
+                  shadowOffset: { width: 0, height: 12 },
+                  elevation: 5
+                }}
+              >
+                <Feather name="camera" size={28} color="#fff" />
+              </View>
+              <Text style={{ color: theme.colors.text, fontSize: 18, fontWeight: "800" }}>Cámara inteligente</Text>
+              <Text style={{ color: theme.colors.muted, textAlign: "center" }}>
+                Enfoca conectores, etiquetas o texturas. No necesitas encuadrar perfecto: la app limpia y destaca lo importante.
+              </Text>
+            </View>
+
+            <View style={{ gap: 10 }}>
+              <PrimaryButton title="Tomar foto" onPress={handleTakePhoto} icon={<Feather name="camera" size={18} color="#fff" />} />
+              <SecondaryButton
+                title="Subir foto"
+                onPress={handleUpload}
+                icon={<Feather name="image" size={18} color={theme.colors.text} />}
+              />
+            </View>
+
+            <View style={{ gap: 10 }}>
+              <Text style={{ color: theme.colors.muted, fontWeight: "700" }}>Añadir pista (opcional)</Text>
+              <TextInput
+                value={searchTerm}
+                onChangeText={setSearchTerm}
+                placeholder="Ej. sensor de oxígeno, bomba de agua"
+                placeholderTextColor={theme.colors.muted}
+                style={{
+                  backgroundColor: theme.colors.card,
+                  borderColor: theme.colors.border,
+                  borderWidth: 1,
+                  borderRadius: theme.radius.lg,
+                  paddingHorizontal: theme.spacing.md,
+                  paddingVertical: theme.spacing.sm,
+                  color: theme.colors.text
+                }}
+              />
+            </View>
+          </View>
         </Card>
-      ) : null}
+
+        <View style={{ flexDirection: "row", gap: 12, flexWrap: "wrap" }}>
+          {[
+            { title: "Luz natural, sin flash", icon: "🌤️" },
+            { title: "Acerca el conector", icon: "🧩" },
+            { title: "Incluye etiquetas o códigos", icon: "🏷️" },
+            { title: "Evita sombras", icon: "✨" }
+          ].map((tip) => (
+            <Card key={tip.title} padded={true}>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+                <Text style={{ fontSize: 18 }}>{tip.icon}</Text>
+                <Text style={{ color: theme.colors.text, fontWeight: "700", flexShrink: 1 }}>{tip.title}</Text>
+              </View>
+            </Card>
+          ))}
+        </View>
+
+        {lastPhoto ? (
+          <Card>
+            <Text style={{ color: theme.colors.muted, marginBottom: 8 }}>Última captura</Text>
+            <Image source={{ uri: lastPhoto }} style={{ width: "100%", height: 220, borderRadius: theme.radius.lg }} />
+          </Card>
+        ) : null}
+      </View>
 
       {showOverlay && lastPhoto ? (
         <View
@@ -166,9 +214,10 @@ export function HomeScreen({ navigation }: NativeStackScreenProps<HomeStackParam
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: "rgba(15,23,42,0.5)",
+            backgroundColor: "rgba(12,18,38,0.62)",
             justifyContent: "center",
-            alignItems: "center"
+            alignItems: "center",
+            padding: theme.spacing.lg
           }}
         >
           <Animated.View
@@ -178,25 +227,26 @@ export function HomeScreen({ navigation }: NativeStackScreenProps<HomeStackParam
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: "rgba(15,23,42,0.45)",
+              backgroundColor: "rgba(15,23,42,0.55)",
               opacity: shutterOpacity
             }}
           />
           <Image
             source={{ uri: lastPhoto }}
-            style={{ width: "90%", height: "70%", borderRadius: theme.radius.xl, opacity: 0.8 }}
-            blurRadius={3}
+            style={{ width: "95%", height: "70%", borderRadius: theme.radius.xl, opacity: 0.75 }}
+            blurRadius={4}
           />
           <Animated.View
             style={{
               position: "absolute",
               width: "70%",
-              height: 2,
-              backgroundColor: "#22d3ee",
+              height: 3,
+              backgroundColor: theme.colors.accent,
+              borderRadius: 6,
               transform: [{ translateY: scanTranslate }]
             }}
           />
-          <View style={{ marginTop: theme.spacing.xl }}>
+          <View style={{ marginTop: theme.spacing.xl, backgroundColor: "rgba(255,255,255,0.08)", padding: theme.spacing.md, borderRadius: theme.radius.lg }}>
             <Text style={{ color: "#fff", fontSize: 18, fontWeight: "800", textAlign: "center" }}>
               {overlayTexts[overlayIndex]}
             </Text>

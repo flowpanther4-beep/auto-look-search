@@ -1,9 +1,12 @@
 import { useState } from "react";
-import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Pressable, Text, View } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { PrimaryButton } from "../../components/PrimaryButton";
-import { ScreenContainer } from "../../components/ScreenContainer";
+import { PrimaryButton, SecondaryButton } from "../../components/PrimaryButton";
+import { Screen } from "../../components/Screen";
 import { AuthStackParamList } from "../../navigation/types";
+import { AppHeader } from "../../components/AppHeader";
+import { TextField } from "../../components/TextField";
+import { theme } from "../../theme";
 
 interface LoginScreenProps extends NativeStackScreenProps<AuthStackParamList, "Login"> {
   onLogin: () => void;
@@ -22,69 +25,18 @@ export function LoginScreen({ navigation, onLogin }: LoginScreenProps) {
   };
 
   return (
-    <ScreenContainer>
-      <Text style={styles.title}>Bienvenido de vuelta</Text>
-      <Text style={styles.subtitle}>Inicia sesión para continuar</Text>
+    <Screen>
+      <AppHeader accent="Welcome back" title="Sign in" subtitle="Access your saved analyses and Pro perks." />
 
-      <View style={styles.form}> 
-        <Text style={styles.label}>Email</Text>
-        <TextInput
-          placeholder="you@example.com"
-          placeholderTextColor="#94a3b8"
-          value={email}
-          onChangeText={setEmail}
-          style={styles.input}
-          autoCapitalize="none"
-        />
-
-        <Text style={styles.label}>Password</Text>
-        <TextInput
-          placeholder="••••••••"
-          placeholderTextColor="#94a3b8"
-          value={password}
-          onChangeText={setPassword}
-          style={styles.input}
-          secureTextEntry
-        />
-
-        <PrimaryButton title="Login" onPress={handleLogin} />
-        <PrimaryButton
-          title="Crear cuenta"
-          variant="secondary"
-          onPress={() => navigation.navigate("Signup")}
-        />
+      <View style={{ gap: theme.spacing.sm }}>
+        <TextField label="Email" placeholder="you@example.com" value={email} onChangeText={setEmail} keyboardType="email-address" />
+        <TextField label="Password" placeholder="••••••••" value={password} onChangeText={setPassword} secureTextEntry />
       </View>
-    </ScreenContainer>
+
+      <View style={{ marginTop: theme.spacing.lg, gap: 10 }}>
+        <PrimaryButton title="Sign in" onPress={handleLogin} />
+        <SecondaryButton title="Create account" onPress={() => navigation.navigate("Signup")} />
+      </View>
+    </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  title: {
-    fontSize: 24,
-    fontWeight: "800",
-    color: "#0f172a"
-  },
-  subtitle: {
-    color: "#475569",
-    marginBottom: 24
-  },
-  form: {
-    marginTop: 12
-  },
-  label: {
-    color: "#0f172a",
-    fontWeight: "600",
-    marginBottom: 8
-  },
-  input: {
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#e2e8f0",
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: "#0f172a",
-    marginBottom: 16
-  }
-});

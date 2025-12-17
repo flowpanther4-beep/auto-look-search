@@ -16,9 +16,9 @@ export type AuthStackParamList = {
 
 export type HomeStackParamList = {
   Home: undefined;
-  VehicleInfo: { photoUri: string };
-  Analyze: { photoUri: string; vehicle: VehicleDetails };
-  Result: { result: IdentifyPartSuccessResponse; photoUri: string };
+  Analyze: { photoUri: string; vehicle?: VehicleDetails; searchTerm?: string };
+  VehicleInfo: { photoUri: string; initialResult: IdentifyPartSuccessResponse; searchTerm?: string };
+  Result: { result: IdentifyPartSuccessResponse; photoUri: string; searchTerm?: string };
 };
 
 export type HistoryStackParamList = {

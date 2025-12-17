@@ -1,10 +1,16 @@
-import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
+import { Linking, Pressable, Text, View } from "react-native";
+import { Feather } from "@expo/vector-icons";
 import { IdentifyPartSuccessResponse } from "../navigation/types";
+import { theme } from "../theme";
+import { ConfidenceBar } from "./ConfidenceBar";
+import { Card } from "./Card";
 
 interface Props {
   candidate: IdentifyPartSuccessResponse["topCandidate"];
   index: number;
   showQuestions?: boolean;
+  highlight?: boolean;
+  onConfirm?: () => void;
 }
 
 const retailerLabels: Record<keyof Props["candidate"]["retailerLinks"], string> = {
@@ -13,138 +19,99 @@ const retailerLabels: Record<keyof Props["candidate"]["retailerLinks"], string> 
   rockauto: "RockAuto"
 };
 
-export function ResultCandidateCard({ candidate, index, showQuestions }: Props) {
-  return (
-    <View style={styles.card}>
-      <View style={styles.headerRow}>
-        <Text style={styles.rank}>#{index + 1}</Text>
-        <Text style={styles.confidence}>{Math.round(candidate.confidence * 100)}%</Text>
-      </View>
-      <Text style={styles.title}>{candidate.commonName}</Text>
-      <Text style={styles.subtitle}>{candidate.technicalName}</Text>
+export function ResultCandidateCard({ candidate, index, showQuestions, highlight, onConfirm }: Props) {
+  const borderColor = highlight ? theme.colors.primary : theme.colors.border;
 
-      <View style={styles.section}> 
-        <Text style={styles.sectionTitle}>Síntomas</Text>
+  return (
+    <Card>
+      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+          <Text style={{ color: theme.colors.muted, fontWeight: "700" }}>#{index + 1}</Text>
+          <View
+            style={{
+              backgroundColor: `${theme.colors.primary}0d`,
+              paddingHorizontal: 10,
+              paddingVertical: 4,
+              borderRadius: theme.radius.md,
+              borderWidth: 1,
+              borderColor
+            }}
+          >
+            <Text style={{ color: theme.colors.text, fontWeight: "700" }}>{candidate.commonName}</Text>
+          </View>
+        </View>
+        <Text style={{ color: theme.colors.muted }}>{candidate.technicalName}</Text>
+      </View>
+
+      <ConfidenceBar value={candidate.confidence} />
+
+      <View style={{ marginTop: theme.spacing.sm, gap: 6 }}>
+        <Text style={{ color: theme.colors.muted, fontWeight: "700" }}>OEM</Text>
+        <Text style={{ color: theme.colors.text }}>{candidate.oemPartNumbers.join(", ")}</Text>
+      </View>
+
+      <View style={{ marginTop: theme.spacing.sm, gap: 6 }}>
+        <Text style={{ color: theme.colors.muted, fontWeight: "700" }}>Aftermarket</Text>
+        <Text style={{ color: theme.colors.text }}>{candidate.aftermarketEquivalents.join(", ")}</Text>
+      </View>
+
+      <View style={{ marginTop: theme.spacing.sm, gap: 6 }}>
+        <Text style={{ color: theme.colors.muted, fontWeight: "700" }}>Symptoms</Text>
         {candidate.symptoms.map((symptom) => (
-          <Text key={symptom} style={styles.listItem}>
+          <Text key={symptom} style={{ color: theme.colors.text }}>
             • {symptom}
           </Text>
         ))}
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>OEM</Text>
-        <Text style={styles.meta}>{candidate.oemPartNumbers.join(", ")}</Text>
-      </View>
+      <Text style={{ color: theme.colors.primary, fontWeight: "800", marginTop: theme.spacing.sm }}>{candidate.priceRange}</Text>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Aftermarket</Text>
-        <Text style={styles.meta}>{candidate.aftermarketEquivalents.join(", ")}</Text>
-      </View>
-
-      <Text style={styles.price}>{candidate.priceRange}</Text>
-
-      <View style={styles.linksRow}>
+      <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: theme.spacing.md }}>
         {Object.entries(candidate.retailerLinks).map(([key, url]) => (
-          <Pressable key={key} style={styles.linkButton} onPress={() => Linking.openURL(url)}>
-            <Text style={styles.linkText}>{retailerLabels[key as keyof typeof retailerLabels]}</Text>
+          <Pressable
+            key={key}
+            onPress={() => Linking.openURL(url)}
+            style={({ pressed }) => ({
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 6,
+              paddingHorizontal: theme.spacing.sm,
+              paddingVertical: theme.spacing.xs,
+              borderRadius: theme.radius.md,
+              backgroundColor: pressed ? `${theme.colors.primary}11` : `${theme.colors.primary}08`
+            })}
+          >
+            <Feather name="external-link" size={16} color={theme.colors.text} />
+            <Text style={{ color: theme.colors.text, fontWeight: "700" }}>{retailerLabels[key as keyof typeof retailerLabels]}</Text>
           </Pressable>
         ))}
       </View>
 
+      {onConfirm ? (
+        <Pressable
+          onPress={onConfirm}
+          style={({ pressed }) => ({
+            marginTop: theme.spacing.md,
+            paddingVertical: theme.spacing.xs,
+            alignItems: "center",
+            borderRadius: theme.radius.lg,
+            backgroundColor: pressed ? `${theme.colors.primary}12` : `${theme.colors.primary}0d`
+          })}
+        >
+          <Text style={{ color: theme.colors.primary, fontWeight: "800" }}>Confirm this part</Text>
+        </Pressable>
+      ) : null}
+
       {showQuestions && candidate.questions && candidate.questions.length > 0 ? (
-        <View style={[styles.section, styles.questionSection]}>
-          <Text style={styles.sectionTitle}>Preguntas para confirmar</Text>
+        <View style={{ marginTop: theme.spacing.md, gap: 6, backgroundColor: `${theme.colors.warning}0d`, padding: theme.spacing.sm, borderRadius: theme.radius.md }}>
+          <Text style={{ color: theme.colors.text, fontWeight: "800" }}>Questions to confirm</Text>
           {candidate.questions.map((question) => (
-            <Text key={question} style={styles.listItem}>
+            <Text key={question} style={{ color: theme.colors.text }}>
               • {question}
             </Text>
           ))}
         </View>
       ) : null}
-    </View>
+    </Card>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 3
-  },
-  headerRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center"
-  },
-  rank: {
-    fontWeight: "800",
-    color: "#0f172a"
-  },
-  confidence: {
-    backgroundColor: "#ecfeff",
-    color: "#0ea5e9",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    fontWeight: "700"
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "700",
-    marginTop: 8,
-    color: "#0f172a"
-  },
-  subtitle: {
-    color: "#475569",
-    marginBottom: 8
-  },
-  section: {
-    marginTop: 8
-  },
-  sectionTitle: {
-    fontWeight: "700",
-    color: "#0f172a",
-    marginBottom: 4
-  },
-  listItem: {
-    color: "#475569",
-    marginBottom: 2
-  },
-  meta: {
-    color: "#0f172a"
-  },
-  price: {
-    fontWeight: "700",
-    color: "#0ea5e9",
-    marginTop: 8,
-    fontSize: 16
-  },
-  linksRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 12
-  },
-  linkButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    backgroundColor: "#0f172a",
-    borderRadius: 12
-  },
-  linkText: {
-    color: "#fff",
-    fontWeight: "700"
-  },
-  questionSection: {
-    backgroundColor: "#f8fafc",
-    padding: 12,
-    borderRadius: 12,
-    marginTop: 14
-  }
-});

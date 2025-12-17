@@ -1,7 +1,7 @@
 import "react-native-gesture-handler";
-import { StatusBar } from "expo-status-bar";
 import { useMemo } from "react";
 import { IdentifyPartResponseSchema } from "@autopartsnap/shared";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { RootNavigator } from "./src/navigation/RootNavigator";
 
 export default function App() {
@@ -44,9 +44,8 @@ export default function App() {
   }, []);
 
   return (
-    <>
-      <StatusBar style="dark" />
+    <SafeAreaProvider>
       <RootNavigator />
-    </>
+    </SafeAreaProvider>
   );
 }

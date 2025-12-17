@@ -1,68 +1,74 @@
-import { Image, StyleSheet, Text } from "react-native";
+import { useState } from "react";
+import { Alert, Image, Text, View } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Card } from "../../components/Card";
-import { PrimaryButton } from "../../components/PrimaryButton";
-import { ResultCandidateCard } from "../../components/ResultCandidateCard";
-import { ScreenContainer } from "../../components/ScreenContainer";
 import { HomeStackParamList } from "../../navigation/types";
+import { Card } from "../../components/Card";
+import { Screen } from "../../components/Screen";
+import { AppHeader } from "../../components/AppHeader";
+import { ResultCandidateCard } from "../../components/ResultCandidateCard";
+import { ConfidenceBar } from "../../components/ConfidenceBar";
+import { PrimaryButton, SecondaryButton } from "../../components/PrimaryButton";
+import { updateHistoryStatus } from "../../storage/history";
+import { theme } from "../../theme";
 
 export function ResultScreen({ route, navigation }: NativeStackScreenProps<HomeStackParamList, "Result">) {
   const { result, photoUri } = route.params;
+  const [confirmed, setConfirmed] = useState(result.topCandidate.confidence >= 0.8);
   const showQuestions = result.topCandidate.confidence < 0.8;
 
+  const handleConfirm = async () => {
+    setConfirmed(true);
+    await updateHistoryStatus(result.analysisId, "confirmed");
+    Alert.alert("Saved", "Marked as confirmed for your history.");
+  };
+
   return (
-    <ScreenContainer>
-      <Text style={styles.title}>Resultado</Text>
-      <Text style={styles.subtitle}>Top {result.candidates.length} candidatos</Text>
+    <Screen>
+      <AppHeader
+        accent={confirmed ? "Confirmed" : "Review"}
+        title={confirmed ? "Locked in" : "Best match"}
+        subtitle="Confidence-driven results with quick follow ups"
+      />
 
       <Card>
-        <Text style={styles.sectionTitle}>Vehículo</Text>
-        <Text style={styles.vehicle}>{result.vehicle.make} {result.vehicle.model} {result.vehicle.year}</Text>
-        {result.vehicle.engine ? <Text style={styles.meta}>Motor: {result.vehicle.engine}</Text> : null}
-        {result.vehicle.partLocation ? <Text style={styles.meta}>Ubicación: {result.vehicle.partLocation}</Text> : null}
+        <Image source={{ uri: photoUri }} style={{ width: "100%", height: 210, borderRadius: theme.radius.lg, marginBottom: theme.spacing.md }} />
+        <Text style={{ color: theme.colors.text, fontWeight: "800", fontSize: 20 }}>{result.topCandidate.commonName}</Text>
+        <Text style={{ color: theme.colors.muted, marginTop: 4 }}>{result.topCandidate.technicalName}</Text>
+        <ConfidenceBar value={result.topCandidate.confidence} />
+        <View style={{ flexDirection: "row", marginTop: theme.spacing.md, gap: 8 }}>
+          <PrimaryButton title="Confirm this part" onPress={handleConfirm} fullWidth={false} disabled={confirmed} />
+          <SecondaryButton title="New analysis" onPress={() => navigation.popToTop()} fullWidth={false} />
+        </View>
       </Card>
 
-      <Card>
-        <Text style={styles.sectionTitle}>Captura</Text>
-        <Image source={{ uri: photoUri }} style={styles.image} />
-      </Card>
+      <AppHeader title="Vehicle" subtitle={`${result.vehicle.make} ${result.vehicle.model} ${result.vehicle.year}`} />
+      <View style={{ flexDirection: "row", gap: 10, marginBottom: theme.spacing.md }}>
+        {result.vehicle.engine ? <SecondaryButton title={`Engine: ${result.vehicle.engine}`} onPress={() => undefined} fullWidth={false} disabled /> : null}
+        {result.vehicle.partLocation ? <SecondaryButton title={`Location: ${result.vehicle.partLocation}`} onPress={() => undefined} fullWidth={false} disabled /> : null}
+      </View>
 
+      <AppHeader title="Other possible matches" subtitle="Confidence ordered" />
       {result.candidates.map((candidate, index) => (
-        <ResultCandidateCard key={candidate.id} candidate={candidate} index={index} showQuestions={showQuestions && index === 0} />
+        <ResultCandidateCard
+          key={candidate.id}
+          candidate={candidate}
+          index={index}
+          highlight={index === 0}
+          showQuestions={showQuestions && index === 0}
+          onConfirm={index === 0 ? handleConfirm : undefined}
+        />
       ))}
 
-      <PrimaryButton title="Nuevo análisis" onPress={() => navigation.popToTop()} />
-    </ScreenContainer>
+      {showQuestions && result.topCandidate.questions && result.topCandidate.questions.length ? (
+        <Card>
+          <Text style={{ color: theme.colors.text, fontWeight: "800", marginBottom: 8 }}>Questions to confirm</Text>
+          {result.topCandidate.questions.map((q) => (
+            <Text key={q} style={{ color: theme.colors.muted, marginBottom: 4 }}>
+              • {q}
+            </Text>
+          ))}
+        </Card>
+      ) : null}
+    </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  title: {
-    fontSize: 24,
-    fontWeight: "800",
-    color: "#0f172a"
-  },
-  subtitle: {
-    color: "#475569",
-    marginBottom: 16
-  },
-  sectionTitle: {
-    fontWeight: "700",
-    color: "#0f172a",
-    marginBottom: 8
-  },
-  vehicle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#0f172a"
-  },
-  meta: {
-    color: "#475569",
-    marginTop: 4
-  },
-  image: {
-    width: "100%",
-    height: 220,
-    borderRadius: 16
-  }
-});

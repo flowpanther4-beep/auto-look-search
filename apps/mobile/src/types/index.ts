@@ -1,9 +1,9 @@
 import { IdentifyPartResponse } from "@autopartsnap/shared";
 
 export type VehicleDetails = {
-  make: string;
-  model: string;
-  year: string;
+  make?: string;
+  model?: string;
+  year?: string;
   engine?: string;
   partLocation?: string;
 };
@@ -15,4 +15,6 @@ export type HistoryItem = {
   vehicle: VehicleDetails;
   topCandidateName: string;
   response: IdentifyPartResponse;
+  confidence: number;
+  status: "confirmed" | "not_sure";
 };

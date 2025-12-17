@@ -1,89 +1,63 @@
-import { Alert, StyleSheet, Text, View } from "react-native";
-import { ScreenContainer } from "../../components/ScreenContainer";
-import { PrimaryButton } from "../../components/PrimaryButton";
+import { Alert, Text, View } from "react-native";
+import { Screen } from "../../components/Screen";
+import { PrimaryButton, SecondaryButton } from "../../components/PrimaryButton";
+import { AppHeader } from "../../components/AppHeader";
+import { Card } from "../../components/Card";
+import { theme } from "../../theme";
+import { Feather } from "@expo/vector-icons";
 
-const benefits = [
-  "Análisis ilimitados",
-  "Compatibilidad avanzada por VIN",
-  "Exportar lista de partes"
+const plans = [
+  { label: "Monthly", price: "$9.99", benefits: ["Unlimited analyses", "VIN-grade matching"] },
+  { label: "Annual", price: "$79.99", benefits: ["2 months free", "Priority support"] }
+];
+
+const bullets = [
+  { icon: "zap", text: "Live confidence tuning" },
+  { icon: "shield", text: "OEM + aftermarket pairs" },
+  { icon: "clock", text: "History re-analysis" }
 ];
 
 export function ProScreen() {
   return (
-    <ScreenContainer>
-      <View style={styles.hero}> 
-        <Text style={styles.badge}>PRO</Text>
-        <Text style={styles.title}>Desbloquea todo</Text>
-        <Text style={styles.subtitle}>Accede a beneficios premium y soporte prioritario.</Text>
-      </View>
+    <Screen>
+      <AppHeader accent="Pro" title="Upgrade for power users" subtitle="Sharper matches, marketplace perks, and VIN smarts." />
 
-      <View style={styles.card}>
-        {benefits.map((item) => (
-          <View key={item} style={styles.benefitRow}>
-            <Text style={styles.check}>✓</Text>
-            <Text style={styles.benefit}>{item}</Text>
-          </View>
+      <View style={{ gap: theme.spacing.md }}>
+        {plans.map((plan) => (
+          <Card key={plan.label}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+              <View>
+                <Text style={{ color: theme.colors.text, fontWeight: "800", fontSize: 18 }}>{plan.label}</Text>
+                <Text style={{ color: theme.colors.muted }}>{plan.price}</Text>
+              </View>
+              <PrimaryButton title="Go Pro" onPress={() => Alert.alert("Go Pro", `${plan.label} purchase flow coming soon`)} fullWidth={false} />
+            </View>
+            <View style={{ marginTop: theme.spacing.sm, gap: 6 }}>
+              {plan.benefits.map((benefit) => (
+                <View key={benefit} style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                  <Feather name="check" size={16} color={theme.colors.primary} />
+                  <Text style={{ color: theme.colors.text }}>{benefit}</Text>
+                </View>
+              ))}
+            </View>
+          </Card>
         ))}
-
-        <PrimaryButton title="Mensual" onPress={() => Alert.alert("Coming soon", "Suscripción mensual pronto disponible")} />
-        <PrimaryButton
-          title="Anual"
-          onPress={() => Alert.alert("Coming soon", "Suscripción anual pronto disponible")}
-          variant="secondary"
-        />
-        <PrimaryButton
-          title="Restore purchases"
-          onPress={() => Alert.alert("Restore", "Intentaremos restaurar tus compras")}
-          variant="secondary"
-        />
       </View>
-    </ScreenContainer>
+
+      <Card>
+        <View style={{ gap: 10 }}>
+          {bullets.map((bullet) => (
+            <View key={bullet.text} style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+              <Feather name={bullet.icon as any} size={16} color={theme.colors.primary} />
+              <Text style={{ color: theme.colors.text, fontWeight: "700" }}>{bullet.text}</Text>
+            </View>
+          ))}
+        </View>
+        <View style={{ marginTop: theme.spacing.md, gap: 10 }}>
+          <PrimaryButton title="Go Pro" onPress={() => Alert.alert("Go Pro", "Checkout coming soon") } />
+          <SecondaryButton title="Restore purchases" onPress={() => Alert.alert("Restore", "Intentaremos restaurar tus compras") } />
+        </View>
+      </Card>
+    </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  hero: {
-    backgroundColor: "#0f172a",
-    padding: 20,
-    borderRadius: 16,
-    marginBottom: 16
-  },
-  badge: {
-    color: "#fde68a",
-    fontWeight: "800",
-    marginBottom: 8
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "800",
-    color: "#fff"
-  },
-  subtitle: {
-    color: "#cbd5e1",
-    marginTop: 8
-  },
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 16,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 3
-  },
-  benefitRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10
-  },
-  check: {
-    color: "#22c55e",
-    fontWeight: "800",
-    marginRight: 8
-  },
-  benefit: {
-    color: "#0f172a",
-    fontWeight: "600"
-  }
-});

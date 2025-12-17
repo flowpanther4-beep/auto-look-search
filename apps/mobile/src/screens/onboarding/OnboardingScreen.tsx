@@ -1,8 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import { Feather } from "@expo/vector-icons";
 import { PrimaryButton } from "../../components/PrimaryButton";
-import { ScreenContainer } from "../../components/ScreenContainer";
+import { Screen } from "../../components/Screen";
+import { AppHeader } from "../../components/AppHeader";
+import { Card } from "../../components/Card";
+import { theme } from "../../theme";
 
 interface OnboardingScreenProps {
   onDone: () => void;
@@ -10,14 +14,16 @@ interface OnboardingScreenProps {
 
 const slides = [
   {
-    title: "Toma una foto",
-    description: "Captura la pieza directamente desde tu cámara para identificarla al instante.",
-    emoji: "📷"
+    title: "Snap & analyze",
+    description: "Large, bold visuals show you exactly what we're scanning.",
+    icon: "camera",
+    bullets: ["Shutter + scanning overlay", "AI text updates"]
   },
   {
-    title: "Confirma tu vehículo",
-    description: "Añade make/model/year y recibe la pieza correcta con preguntas de confirmación.",
-    emoji: "🚗"
+    title: "Confirm fast",
+    description: "Only ask for vehicle details when confidence is low.",
+    icon: "zap",
+    bullets: ["Confidence-based flow", "Questions to confirm"]
   }
 ];
 
@@ -37,80 +43,56 @@ export function OnboardingScreen({ onDone }: OnboardingScreenProps) {
   const slide = slides[index];
 
   return (
-    <ScreenContainer>
-      <View style={styles.badge}> 
-        <Text style={styles.badgeText}>AutoPartSnap</Text>
-      </View>
-      <View style={styles.emojiContainer}>
-        <Text style={styles.emoji}>{slide.emoji}</Text>
-      </View>
-      <Text style={styles.title}>{slide.title}</Text>
-      <Text style={styles.description}>{slide.description}</Text>
+    <Screen scrollable={false}>
+      <AppHeader accent="AutoPartSnap" title="Modern, confident flow" subtitle="A clean, Apple-like experience for instant trust." />
 
-      <View style={styles.footer}>
-        <View style={styles.dots}>
-          {slides.map((_, i) => (
-            <View key={i} style={[styles.dot, i === index && styles.dotActive]} />
+      <Card>
+        <View style={{ alignItems: "center", paddingVertical: theme.spacing.md }}>
+          <View
+            style={{
+              width: 120,
+              height: 120,
+              borderRadius: 60,
+              backgroundColor: `${theme.colors.primary}0d`,
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+            <Feather name={slide.icon as any} size={48} color={theme.colors.primary} />
+          </View>
+          <Text style={{ color: theme.colors.text, fontWeight: "800", fontSize: 22, marginTop: theme.spacing.sm }}>
+            {slide.title}
+          </Text>
+          <Text style={{ color: theme.colors.muted, textAlign: "center", marginTop: 6 }}>{slide.description}</Text>
+        </View>
+
+        <View style={{ gap: 8 }}>
+          {slide.bullets.map((bullet) => (
+            <View key={bullet} style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+              <Feather name="check" color={theme.colors.primary} size={16} />
+              <Text style={{ color: theme.colors.text, fontWeight: "700" }}>{bullet}</Text>
+            </View>
           ))}
         </View>
-        <PrimaryButton title={index === slides.length - 1 ? "Comenzar" : "Continuar"} onPress={handleContinue} />
+      </Card>
+
+      <View style={{ flexDirection: "row", gap: 8, marginTop: theme.spacing.sm }}>
+        {slides.map((_, i) => (
+          <View
+            key={i}
+            style={{
+              height: 10,
+              flex: 1,
+              borderRadius: 6,
+              backgroundColor: i === index ? theme.colors.primary : theme.colors.border
+            }}
+          />
+        ))}
       </View>
-    </ScreenContainer>
+
+      <View style={{ marginTop: theme.spacing.lg }}>
+        <PrimaryButton title={index === slides.length - 1 ? "Continue" : "Next"} onPress={handleContinue} />
+      </View>
+    </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  badge: {
-    alignSelf: "flex-start",
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    backgroundColor: "#e0f2fe",
-    borderRadius: 12,
-    marginBottom: 20
-  },
-  badgeText: {
-    color: "#0369a1",
-    fontWeight: "700"
-  },
-  emojiContainer: {
-    width: "100%",
-    height: 240,
-    borderRadius: 20,
-    backgroundColor: "#e0f2fe",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 16
-  },
-  emoji: {
-    fontSize: 96
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "800",
-    color: "#0f172a",
-    marginBottom: 8
-  },
-  description: {
-    color: "#475569",
-    fontSize: 16,
-    marginBottom: 24
-  },
-  footer: {
-    marginTop: "auto"
-  },
-  dots: {
-    flexDirection: "row",
-    marginBottom: 12
-  },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#e2e8f0",
-    marginRight: 8
-  },
-  dotActive: {
-    backgroundColor: "#0ea5e9",
-    width: 22
-  }
-});

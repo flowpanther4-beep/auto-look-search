@@ -1,44 +1,60 @@
 import { useMemo } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { View } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { PrimaryButton } from "../../components/PrimaryButton";
-import { ScreenContainer } from "../../components/ScreenContainer";
-import { TextField } from "../../components/TextField";
 import { HomeStackParamList } from "../../navigation/types";
 import { VehicleDetails } from "../../types";
+import { Screen } from "../../components/Screen";
+import { AppHeader } from "../../components/AppHeader";
+import { TextField } from "../../components/TextField";
+import { Chip } from "../../components/Chip";
+import { PrimaryButton } from "../../components/PrimaryButton";
+import { theme } from "../../theme";
 
 const schema = z.object({
-  make: z.string().min(1, "Requerido"),
-  model: z.string().min(1, "Requerido"),
-  year: z.string().min(4, "Año inválido"),
+  make: z.string().min(1, "Required"),
+  model: z.string().min(1, "Required"),
+  year: z.string().min(4, "Year"),
   engine: z.string().optional(),
   partLocation: z.string().optional()
 });
 
+const PART_LOCATIONS = ["Engine", "Brakes", "Suspension", "Interior", "Electrical"] as const;
+
+type FormValues = z.infer<typeof schema>;
+
 export function VehicleInfoScreen({ route, navigation }: NativeStackScreenProps<HomeStackParamList, "VehicleInfo">) {
-  const { handleSubmit, formState, watch, setValue } = useForm<VehicleDetails>({
+  const { initialResult, photoUri, searchTerm } = route.params;
+  const { handleSubmit, formState, watch, setValue } = useForm<FormValues>({
     resolver: zodResolver(schema),
     mode: "onChange",
-    defaultValues: { make: "", model: "", year: "", engine: "", partLocation: "" }
+    defaultValues: {
+      make: initialResult.vehicle.make ?? "",
+      model: initialResult.vehicle.model ?? "",
+      year: initialResult.vehicle.year ?? "",
+      engine: initialResult.vehicle.engine ?? "",
+      partLocation: initialResult.vehicle.partLocation ?? ""
+    }
   });
 
   const values = watch();
-
-  const onSubmit = (data: VehicleDetails) => {
-    navigation.navigate("Analyze", { photoUri: route.params.photoUri, vehicle: data });
-  };
-
   const isValid = useMemo(() => formState.isValid, [formState.isValid]);
 
-  return (
-    <ScreenContainer>
-      <Text style={styles.title}>Datos del vehículo</Text>
-      <Text style={styles.subtitle}>Make / Model / Year son obligatorios</Text>
+  const onSubmit = (data: VehicleDetails) => {
+    navigation.replace("Analyze", { photoUri, vehicle: data, searchTerm });
+  };
 
-      <View style={styles.form}>
+  return (
+    <Screen scrollable={false}>
+      <AppHeader
+        accent="Refine results"
+        title="Add quick vehicle context"
+        subtitle="We only ask when confidence is low. This helps us lock onto the right part."
+      />
+
+      <View style={{ flex: 1 }}>
         <TextField
           label="Make"
           value={values.make}
@@ -56,35 +72,33 @@ export function VehicleInfoScreen({ route, navigation }: NativeStackScreenProps<
           value={values.year}
           onChangeText={(text) => setValue("year", text, { shouldValidate: true })}
           error={formState.errors.year?.message}
+          keyboardType="numeric"
         />
         <TextField
-          label="Engine (opcional)"
+          label="Engine (optional)"
           value={values.engine ?? ""}
           onChangeText={(text) => setValue("engine", text, { shouldValidate: true })}
+          helper="Trim, displacement, or fuel type"
         />
-        <TextField
-          label="Ubicación de la pieza (opcional)"
-          value={values.partLocation ?? ""}
-          onChangeText={(text) => setValue("partLocation", text, { shouldValidate: true })}
-        />
+
+        <View style={{ marginBottom: theme.spacing.md }}>
+          <AppHeader title="Part location" subtitle="Helps prioritize the right subsystem." />
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
+            {PART_LOCATIONS.map((location) => (
+              <Chip
+                key={location}
+                label={location}
+                selected={values.partLocation === location}
+                onPress={() => setValue("partLocation", location, { shouldValidate: true })}
+              />
+            ))}
+          </View>
+        </View>
       </View>
 
-      <PrimaryButton title="Analizar" onPress={handleSubmit(onSubmit)} disabled={!isValid} />
-    </ScreenContainer>
+      <View style={{ paddingVertical: theme.spacing.sm }}>
+        <PrimaryButton title="Re-analyze" onPress={handleSubmit(onSubmit)} disabled={!isValid} />
+      </View>
+    </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  title: {
-    fontSize: 24,
-    fontWeight: "800",
-    color: "#0f172a"
-  },
-  subtitle: {
-    color: "#475569",
-    marginBottom: 24
-  },
-  form: {
-    marginBottom: 16
-  }
-});

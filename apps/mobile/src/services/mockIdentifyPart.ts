@@ -57,28 +57,45 @@ const baseCandidates = [
   }
 ];
 
-export async function mockIdentifyPart(vehicle: VehicleDetails): Promise<IdentifyPartSuccessResponse> {
-  await new Promise((resolve) => setTimeout(resolve, 1500));
+function normalizeVehicle(vehicle: VehicleDetails): Required<VehicleDetails> {
+  return {
+    make: vehicle.make?.trim() || "Unknown",
+    model: vehicle.model?.trim() || "Model",
+    year: vehicle.year?.trim() || new Date().getFullYear().toString(),
+    engine: vehicle.engine?.trim() || "",
+    partLocation: vehicle.partLocation?.trim() || ""
+  };
+}
 
-  const enriched = baseCandidates.map((candidate) => {
+export async function mockIdentifyPart(vehicle: VehicleDetails = {}, searchTerm?: string): Promise<IdentifyPartSuccessResponse> {
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
+  const normalizedVehicle = normalizeVehicle(vehicle);
+  const confidenceSwing = Math.random() * 0.25 - 0.05;
+
+  const enriched = baseCandidates.map((candidate, idx) => {
     const primaryOem = candidate.oemPartNumbers[0] ?? "";
-    const searchQuery = `${candidate.commonName} ${vehicle.make} ${vehicle.model} ${vehicle.year} ${primaryOem}`.trim();
+    const hint = searchTerm?.trim() ? `${searchTerm} ` : "";
+    const searchQuery = `${hint}${candidate.commonName} ${normalizedVehicle.make} ${normalizedVehicle.model} ${normalizedVehicle.year} ${primaryOem}`.trim();
+    const confidence = Math.min(0.96, Math.max(0.45, candidate.confidence + confidenceSwing + idx * 0.04));
 
     return {
       ...candidate,
+      confidence,
       searchQuery,
       retailerLinks: buildRetailerLinks(searchQuery)
     } satisfies IdentifyPartSuccessResponse["topCandidate"];
   });
 
-  const topCandidate = enriched[0];
+  const sorted = [...enriched].sort((a, b) => b.confidence - a.confidence);
+  const topCandidate = sorted[0];
 
   const response: IdentifyPartResponse = {
     success: true,
     analysisId: `mock-${Date.now()}`,
-    vehicle,
+    vehicle: normalizedVehicle,
     topCandidate,
-    candidates: enriched
+    candidates: sorted
   };
 
   return response as IdentifyPartSuccessResponse;

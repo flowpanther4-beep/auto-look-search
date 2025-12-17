@@ -2,12 +2,12 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "jsx": "react-native",
-    "types": ["react", "react-native", "expo"],
+    "types": ["react", "react-native", "expo", "nativewind/types"],
     "baseUrl": ".",
     "paths": {
       "@autopartsnap/shared": ["../../packages/shared/src"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["**/*.ts", "**/*.tsx", "nativewind-env.d.ts"],
   "exclude": ["node_modules"]
 }

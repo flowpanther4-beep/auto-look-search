@@ -1,13 +1,15 @@
-import { ReactNode } from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { TextInput, Text, View } from "react-native";
+import { theme } from "../theme";
 
 interface TextFieldProps {
   label: string;
   placeholder?: string;
   value: string;
-  onChangeText: (value: string) => void;
+  onChangeText: (text: string) => void;
+  helper?: string;
   error?: string;
-  rightElement?: ReactNode;
+  secureTextEntry?: boolean;
+  keyboardType?: "default" | "numeric" | "email-address";
 }
 
 export function TextField({
@@ -15,56 +17,36 @@ export function TextField({
   placeholder,
   value,
   onChangeText,
+  helper,
   error,
-  rightElement
+  secureTextEntry,
+  keyboardType = "default"
 }: TextFieldProps) {
+  const borderColor = error ? "#f43f5e" : theme.colors.border;
+
   return (
-    <View style={styles.container}>
-      <View style={styles.labelRow}>
-        <Text style={styles.label}>{label}</Text>
-        {rightElement}
-      </View>
+    <View style={{ marginBottom: theme.spacing.md }}>
+      <Text style={{ color: theme.colors.text, fontWeight: "600", marginBottom: 6 }}>{label}</Text>
       <TextInput
-        style={[styles.input, error && styles.inputError]}
-        placeholder={placeholder}
         value={value}
+        placeholder={placeholder}
+        placeholderTextColor={theme.colors.muted}
         onChangeText={onChangeText}
-        placeholderTextColor="#94a3b8"
+        secureTextEntry={secureTextEntry}
+        keyboardType={keyboardType}
+        style={{
+          backgroundColor: theme.colors.card,
+          borderColor,
+          borderWidth: 1,
+          borderRadius: theme.radius.lg,
+          paddingHorizontal: theme.spacing.md,
+          paddingVertical: theme.spacing.sm,
+          color: theme.colors.text,
+          fontSize: 16
+        }}
       />
-      {error ? <Text style={styles.error}>{error}</Text> : null}
+      {helper && !error ? <Text style={{ color: theme.colors.muted, marginTop: 6 }}>{helper}</Text> : null}
+      {error ? <Text style={{ color: "#f43f5e", marginTop: 6, fontWeight: "600" }}>{error}</Text> : null}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 12
-  },
-  labelRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between"
-  },
-  label: {
-    fontWeight: "600",
-    color: "#0f172a",
-    marginBottom: 6
-  },
-  input: {
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#e2e8f0",
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: "#0f172a"
-  },
-  inputError: {
-    borderColor: "#ef4444"
-  },
-  error: {
-    color: "#ef4444",
-    marginTop: 6
-  }
-});

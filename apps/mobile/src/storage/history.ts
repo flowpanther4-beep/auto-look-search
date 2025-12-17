@@ -18,6 +18,12 @@ export async function loadHistory(): Promise<HistoryItem[]> {
 
 export async function saveHistoryItem(item: HistoryItem): Promise<void> {
   const current = await loadHistory();
-  const updated = [item, ...current];
+  const updated = [item, ...current.filter((existing) => existing.id !== item.id)];
+  await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+}
+
+export async function updateHistoryStatus(id: string, status: HistoryItem["status"]): Promise<void> {
+  const current = await loadHistory();
+  const updated = current.map((entry) => (entry.id === id ? { ...entry, status } : entry));
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
 }

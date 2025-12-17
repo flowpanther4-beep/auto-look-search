@@ -1,9 +1,10 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Feather } from "@expo/vector-icons";
 import { HomeNavigator } from "./HomeNavigator";
 import { HistoryNavigator } from "./HistoryNavigator";
 import { AppTabParamList } from "./types";
 import { ProScreen } from "../screens/pro/ProScreen";
-import { Text } from "react-native";
+import { theme } from "../theme";
 
 const Tab = createBottomTabNavigator<AppTabParamList>();
 
@@ -12,7 +13,9 @@ export function AppTabsNavigator() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#0f172a",
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: theme.colors.muted,
+        tabBarStyle: { backgroundColor: theme.colors.card, borderTopColor: theme.colors.border },
         tabBarLabelStyle: { fontWeight: "700" }
       }}
     >
@@ -21,7 +24,7 @@ export function AppTabsNavigator() {
         component={HomeNavigator}
         options={{
           title: "Home",
-          tabBarIcon: () => <Text>🏠</Text>
+          tabBarIcon: ({ color, size }) => <Feather name="home" size={size} color={color} />
         }}
       />
       <Tab.Screen
@@ -29,7 +32,7 @@ export function AppTabsNavigator() {
         component={HistoryNavigator}
         options={{
           title: "History",
-          tabBarIcon: () => <Text>🕑</Text>
+          tabBarIcon: ({ color, size }) => <Feather name="clock" size={size} color={color} />
         }}
       />
       <Tab.Screen
@@ -37,7 +40,7 @@ export function AppTabsNavigator() {
         component={ProScreen}
         options={{
           title: "Pro",
-          tabBarIcon: () => <Text>⚡️</Text>
+          tabBarIcon: ({ color, size }) => <Feather name="zap" size={size} color={color} />
         }}
       />
     </Tab.Navigator>
